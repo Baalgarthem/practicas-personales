@@ -64,54 +64,52 @@ public class ConvertirExpresion {
         return "Expresión no reconocida";
     }
 
-    public String infijaAPrefija(String expresionInfija) {
-        StringBuilder expresionPrefija = new StringBuilder();
-        Stack<Character> pilaOperadores = new Stack<>();
-        String[] elementos = expresionInfija.split("(?<=[\\d)])(?=[\\s]*[\\(\\+\\-\\*/\\^])|(?<=[\\+\\-\\*/\\^\\(\\)\\s])(?=[\\d\\(])");
+public static String infijaAPrefija(String expresionInfija) {
+    StringBuilder expresionPrefija = new StringBuilder();
+    Stack<Character> pilaOperadores = new Stack<>();
+    char[] elementos = expresionInfija.replaceAll("\\s+","").toCharArray();
 
-        // Se recorre la expresión infija de derecha a izquierda
-        for (int i = elementos.length - 1; i >= 0; i--) {
-            String elemento = elementos[i];
+    // Se recorre la expresión infija de derecha a izquierda
+    for (int i = elementos.length - 1; i >= 0; i--) {
+        char elemento = elementos[i];
 
-            // Si el elemento es un espacio en blanco, se ignora
-            if (elemento.matches("\\s+")) {
-                continue;
+        // Si el elemento es un número, se agrega a la expresión prefija
+        if (Character.isDigit(elemento)) {
+            expresionPrefija.insert(0, elemento);
+
+            // Si el elemento anterior es un número, se agregaron varios dígitos
+            while (i > 0 && Character.isDigit(elementos[i - 1])) {
+                i--;
+                expresionPrefija.insert(0, elementos[i]);
             }
-
-            // Si el elemento es un número, se agrega a la expresión prefija
-            if (elemento.matches("\\d+(\\.\\d+)?")) {
-                expresionPrefija.insert(0, " " + elemento);
-
-                // Si el elemento anterior es un espacio en blanco, se agregaron varios dígitos
-                while (i > 0 && elementos[i - 1].matches("\\d+(\\.\\d+)?")) {
-                    i--;
-                    expresionPrefija.insert(0, elementos[i]);
-                }
-            } else if (elemento.equals(")")) {
-                pilaOperadores.push(')');
-            } else if (elemento.matches("[\\+\\-\\*/\\^]")) {
-                while (!pilaOperadores.isEmpty() && precedencia.get(elemento.charAt(0)) < precedencia.get(pilaOperadores.peek())) {
-                    expresionPrefija.insert(0, " " + pilaOperadores.pop());
-                }
-                expresionPrefija.insert(0, " ");
-                pilaOperadores.push(elemento.charAt(0));
-            } else if (elemento.equals("(")) {
+            expresionPrefija.insert(0, ' ');
+        } else if (elemento == ')' || elemento == '(') {
+            if (elemento == ')') {
+                pilaOperadores.push(elemento);
+            } else {
                 while (!pilaOperadores.isEmpty() && pilaOperadores.peek() != ')') {
-                    expresionPrefija.insert(0, " " + pilaOperadores.pop());
+                    expresionPrefija.insert(0, pilaOperadores.pop() + " ");
                 }
                 if (!pilaOperadores.isEmpty()) {
                     pilaOperadores.pop();
                 }
             }
+        } else if (precedencia.containsKey(elemento)) {
+            while (!pilaOperadores.isEmpty() && precedencia.get(elemento) < precedencia.get(pilaOperadores.peek())) {
+                expresionPrefija.insert(0, pilaOperadores.pop() + " ");
+            }
+            pilaOperadores.push(elemento);
         }
-
-        // Después de recorrer toda la expresión, se agregan los operadores restantes a la expresión prefija
-        while (!pilaOperadores.isEmpty()) {
-            expresionPrefija.insert(0, " " + pilaOperadores.pop());
-        }
-
-        return expresionPrefija.toString().trim();
     }
+
+    // Después de recorrer toda la expresión, se agregan los operadores restantes a la expresión prefija
+    while (!pilaOperadores.isEmpty()) {
+        expresionPrefija.insert(0, pilaOperadores.pop() + " ");
+    }
+
+    return expresionPrefija.toString().trim();
+}
+
 
 public static String infijaAPostfija(String expresionInfija) {
     StringBuilder expresionPostfija = new StringBuilder();
@@ -144,7 +142,6 @@ public static String infijaAPostfija(String expresionInfija) {
 
     return expresionPostfija.toString().trim();
 }
-
 
     public static String convertirPrefijaAInfija(String prefija) {
         prefija = prefija.replaceAll("\\s+", ""); // ignora los espacios en blanco
@@ -273,6 +270,9 @@ public static String infijaAPostfija(String expresionInfija) {
                 } else {
                     System.out.println("Elija un destino válido");
                 }
+                break;
+            case "Expresión no reconocida":
+                System.exit(1);
                 break;
 
             default:
