@@ -15,8 +15,8 @@ public class Main {
 
         String tipoExpresion = accesoMetodos.detectarTipoExpresion(expresion);
         System.out.println("El tipo de la expresión ingresada es: " + tipoExpresion);
-        
-         System.out.println("¿A qué notación desea convertir la expresión? (infija, prefija, postfija)");
+       
+         System.out.println("ESCRIBA MANUALMENTE > 'infija, prefija, postfija'");
         String expresionDeSALIDA = scanner.nextLine();
         
         String resultado = accesoMetodos.convertirExpresion(expresion, expresionDeSALIDA);
