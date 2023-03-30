@@ -1,18 +1,23 @@
 package Notaciones;
 
+import java.awt.List;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ConvertirExpresion {
 
+    static final String OPERADORES = "[\\+\\-\\*/\\^]";
+    static final String NUMERO = "\\d+(\\.\\d+)?";
     static final String NOTACION_INFIJA = "\\s*(\\d+\\s*[+\\-*/^]\\s*)+\\d+\\s*(\\(\\s*(\\d+\\s*[+\\-*/^]\\s*)+\\d+\\s*\\)\\s*(\\s*[+\\-*/^]\\s*\\(\\s*(\\d+\\s*[+\\-*/^]\\s*)+\\d+\\s*\\)\\s*)*)*";
-    static final String NOTACION_PREFIJA = "\\s*[\\+\\-\\*/\\^]\\s*((\\s*(\\d+(\\.\\d+)?)\\s*)+|\\s*[\\+\\-\\*/\\^]\\s*((\\s*(\\d+(\\.\\d+)?)\\s*)+\\s*)+)+";
-    static final String NOTACION_POSTFIJA = "\\d+(\\.\\d+)?(\\s+\\d+(\\.\\d+)?\\s+[\\+\\-\\*/\\^])*\\s*\\d+(\\.\\d+)?\\s*[\\+\\-\\*/\\^]?";
+    static final String NOTACION_PREFIJA = "\\s*" + OPERADORES + "\\s*((\\s*" + NUMERO + "\\s*)+|\\s*" + OPERADORES + "\\s*((\\s*" + NUMERO + "\\s*)+\\s*)+)+";
+static final String NOTACION_POSTFIJA = "(\\s*\\d+(\\.\\d+)?\\s+)+((\\s*[\\+\\-\\*/\\^]\\s+\\d+(\\.\\d+)?\\s+)+)+[\\+\\-\\*/\\^]?\\s*|\\d+(\\.\\d+)?(\\s+\\d+(\\.\\d+)?(\\s+[\\+\\-\\*/\\^]\\s+)?)*\\s*[\\+\\-\\*/\\^]?\\s*";
 
     public ConvertirExpresion(String expresionIngresada) {
     }
@@ -20,41 +25,25 @@ public class ConvertirExpresion {
     public ConvertirExpresion() {
     }
 
-    private static final Map<Character, Integer> precedencia = new HashMap<>();
+    private static final Map<Character, Integer> precedenciaOperadores = new HashMap<>();
 
     static {
-        precedencia.put('^', 3);
-        precedencia.put('*', 2);
-        precedencia.put('/', 2);
-        precedencia.put('+', 1);
-        precedencia.put('-', 1);
+        precedenciaOperadores.put('^', 3);
+        precedenciaOperadores.put('*', 2);
+        precedenciaOperadores.put('/', 2);
+        precedenciaOperadores.put('+', 1);
+        precedenciaOperadores.put('-', 1);
     }
 
-    private static boolean esOperador(char c) {
-        return c == '+' || c == '-' || c == '*' || c == '/' || c == '^';
-    }
+    private static final Map<String, String> expresionesRegulares = new HashMap<>();
 
-    private static int jerarquiaOperadores(char operador) {
-        switch (operador) {
-            case '^':
-                return 3;
-            case '*':
-            case '/':
-                return 2;
-            case '+':
-            case '-':
-                return 1;
-            default:
-                return 0;
-        }
-    }
-
-    public String detectarTipoExpresion(String expresion) {
-        Map<String, String> expresionesRegulares = new HashMap<>();
+    static {
         expresionesRegulares.put(NOTACION_INFIJA, "infija");
         expresionesRegulares.put(NOTACION_PREFIJA, "prefija");
         expresionesRegulares.put(NOTACION_POSTFIJA, "postfija");
+    }
 
+    public String detectarTipoExpresion(String expresion) {
         for (Map.Entry<String, String> entrada : expresionesRegulares.entrySet()) {
             if (expresion.matches(entrada.getKey())) {
                 return entrada.getValue();
@@ -64,173 +53,219 @@ public class ConvertirExpresion {
         return "Expresión no reconocida";
     }
 
-public static String infijaAPrefija(String expresionInfija) {
-    StringBuilder expresionPrefija = new StringBuilder();
-    Stack<Character> pilaOperadores = new Stack<>();
-    char[] elementos = expresionInfija.replaceAll("\\s+","").toCharArray();
+    public static String infijaAPrefija(String expresionInfija) {
+        StringBuilder expresionPrefija = new StringBuilder();
+        Stack<Character> pilaOperadores = new Stack<>();
+        char[] elementos = expresionInfija.replaceAll("\\s+", "").toCharArray();
 
-    // Se recorre la expresión infija de derecha a izquierda
-    for (int i = elementos.length - 1; i >= 0; i--) {
-        char elemento = elementos[i];
+        // Se recorre la expresión infija de derecha a izquierda
+        for (int i = elementos.length - 1; i >= 0; i--) {
+            char elemento = elementos[i];
 
-        // Si el elemento es un número, se agrega a la expresión prefija
-        if (Character.isDigit(elemento)) {
-            expresionPrefija.insert(0, elemento);
+            // Si el elemento es un número, se agrega a la expresión prefija
+            if (Character.isDigit(elemento)) {
+                expresionPrefija.insert(0, elemento);
 
-            // Si el elemento anterior es un número, se agregaron varios dígitos
-            while (i > 0 && Character.isDigit(elementos[i - 1])) {
-                i--;
-                expresionPrefija.insert(0, elementos[i]);
-            }
-            expresionPrefija.insert(0, ' ');
-        } else if (elemento == ')' || elemento == '(') {
-            if (elemento == ')') {
-                pilaOperadores.push(elemento);
-            } else {
-                while (!pilaOperadores.isEmpty() && pilaOperadores.peek() != ')') {
+                // Si el elemento anterior es un número, se agregaron varios dígitos
+                while (i > 0 && Character.isDigit(elementos[i - 1])) {
+                    i--;
+                    expresionPrefija.insert(0, elementos[i]);
+                }
+                expresionPrefija.insert(0, ' ');
+            } else if (elemento == ')' || elemento == '(') {
+                if (elemento == ')') {
+                    pilaOperadores.push(elemento);
+                } else {
+                    while (!pilaOperadores.isEmpty() && pilaOperadores.peek() != ')') {
+                        expresionPrefija.insert(0, pilaOperadores.pop() + " ");
+                    }
+                    if (!pilaOperadores.isEmpty()) {
+                        pilaOperadores.pop();
+                    }
+                }
+            } else if (precedenciaOperadores.containsKey(elemento)) {
+                while (!pilaOperadores.isEmpty() && precedenciaOperadores.get(elemento) < precedenciaOperadores.get(pilaOperadores.peek())) {
                     expresionPrefija.insert(0, pilaOperadores.pop() + " ");
                 }
-                if (!pilaOperadores.isEmpty()) {
+                pilaOperadores.push(elemento);
+            }
+        }
+
+        // Después de recorrer toda la expresión, se agregan los operadores restantes a la expresión prefija
+        while (!pilaOperadores.isEmpty()) {
+            expresionPrefija.insert(0, pilaOperadores.pop() + " ");
+        }
+
+        return expresionPrefija.toString().trim();
+    }
+
+    public static String infijaAPostfija(String expresionInfija) {
+        StringBuilder expresionPostfija = new StringBuilder();
+        Stack<Character> pilaOperadores = new Stack<>();
+        String[] elementos = expresionInfija.replaceAll("\\s+", "").split("(?<=[\\d)])(?=[\\+\\-\\*/\\^\\(])|(?<=[\\+\\-\\*/\\^\\(])(?=[\\d\\)])");
+
+        for (String elemento : elementos) {
+            if (elemento.matches("\\d+(\\.\\d+)?")) { // Si el elemento es un número, se agrega a la expresión postfija
+                expresionPostfija.append(elemento).append(" ");
+            } else if (elemento.equals("(")) {
+                pilaOperadores.push('(');
+            } else if (elemento.equals(")")) {
+                while (!pilaOperadores.isEmpty() && pilaOperadores.peek() != '(') {
+                    expresionPostfija.append(pilaOperadores.pop()).append(" ");
+                }
+                if (!pilaOperadores.isEmpty() && pilaOperadores.peek() == '(') {
                     pilaOperadores.pop();
                 }
+            } else { // Si el elemento es un operador
+                while (!pilaOperadores.isEmpty() && precedenciaOperadores.get(pilaOperadores.peek()) >= precedenciaOperadores.get(elemento.charAt(0))) {
+                    expresionPostfija.append(pilaOperadores.pop()).append(" ");
+                }
+                pilaOperadores.push(elemento.charAt(0));
             }
-        } else if (precedencia.containsKey(elemento)) {
-            while (!pilaOperadores.isEmpty() && precedencia.get(elemento) < precedencia.get(pilaOperadores.peek())) {
-                expresionPrefija.insert(0, pilaOperadores.pop() + " ");
+        }
+
+        while (!pilaOperadores.isEmpty()) { // Después de recorrer toda la expresión, se agregan los operadores restantes a la expresión postfija
+            expresionPostfija.append(pilaOperadores.pop()).append(" ");
+        }
+
+        return expresionPostfija.toString().trim();
+    }
+
+    public static String prefijaAInfija(String expresionPrefija) {
+        Stack<String> pilaOperandos = new Stack<>();
+        char[] elementos = expresionPrefija.trim().toCharArray();
+
+        // Se recorre la expresión prefija de derecha a izquierda
+        for (int i = elementos.length - 1; i >= 0; i--) {
+            char elemento = elementos[i];
+
+            // Si el elemento es un número, se agrega a la pila de operandos
+            if (Character.isDigit(elemento)) {
+                StringBuilder sb = new StringBuilder();
+                sb.append(elemento);
+
+                // Si el elemento anterior es un número, se agregaron varios dígitos
+                while (i > 0 && Character.isDigit(elementos[i - 1])) {
+                    i--;
+                    sb.insert(0, elementos[i]);
+                }
+
+                pilaOperandos.push(sb.toString());
+            } else if (precedenciaOperadores.containsKey(elemento)) {
+                // Se sacan los dos operandos superiores de la pila
+                String operando1 = pilaOperandos.pop();
+                String operando2 = pilaOperandos.pop();
+
+                // Se construye la subexpresión infija y se agrega a la pila de operandos
+                String subexpresionInfija = "(" + operando1 + " " + elemento + " " + operando2 + ")";
+                pilaOperandos.push(subexpresionInfija);
             }
-            pilaOperadores.push(elemento);
+        }
+
+        // Al final, la pila de operandos debe contener una sola expresión infija
+        if (pilaOperandos.size() == 1) {
+            return pilaOperandos.pop();
+        } else {
+            return "Expresión no válida";
         }
     }
 
-    // Después de recorrer toda la expresión, se agregan los operadores restantes a la expresión prefija
-    while (!pilaOperadores.isEmpty()) {
-        expresionPrefija.insert(0, pilaOperadores.pop() + " ");
+    public static String prefijaAPostfija(String expresionPrefija) {
+        StringBuilder expresionPostfija = new StringBuilder();
+        Stack<Character> pilaOperadores = new Stack<>();
+        char[] elementos = expresionPrefija.replaceAll("\\s+", "").toCharArray();
+
+        // Se recorre la expresión prefija de derecha a izquierda
+        for (int i = elementos.length - 1; i >= 0; i--) {
+            char elemento = elementos[i];
+
+            // Si el elemento es un número, se agrega a la expresión postfija
+            if (Character.isDigit(elemento)) {
+                expresionPostfija.insert(0, elemento);
+
+                // Si el elemento anterior es un número, se agregaron varios dígitos
+                while (i > 0 && Character.isDigit(elementos[i - 1])) {
+                    i--;
+                    expresionPostfija.insert(0, elementos[i]);
+                }
+                expresionPostfija.insert(0, ' ');
+            } else if (precedenciaOperadores.containsKey(elemento)) {
+                while (!pilaOperadores.isEmpty() && precedenciaOperadores.get(elemento) < precedenciaOperadores.get(pilaOperadores.peek())) {
+                    expresionPostfija.insert(0, pilaOperadores.pop() + " ");
+                }
+                pilaOperadores.push(elemento);
+            }
+        }
+
+        // Después de recorrer toda la expresión, se agregan los operadores restantes a la expresión postfija
+        while (!pilaOperadores.isEmpty()) {
+            expresionPostfija.insert(0, pilaOperadores.pop() + " ");
+        }
+
+        return expresionPostfija.toString().trim();
     }
 
-    return expresionPrefija.toString().trim();
-}
-
-
-public static String infijaAPostfija(String expresionInfija) {
-    StringBuilder expresionPostfija = new StringBuilder();
-    Stack<Character> pilaOperadores = new Stack<>();
-    String[] elementos = expresionInfija.replaceAll("\\s+", "").split("(?<=[\\d)])(?=[\\+\\-\\*/\\^\\(])|(?<=[\\+\\-\\*/\\^\\(])(?=[\\d\\)])");
+ public static String postfijaAPrefija(String expresionPostfija) throws IllegalArgumentException {
+    Stack<String> pilaOperandos = new Stack<>();
+    String[] elementos = expresionPostfija.split("\\s+");
 
     for (String elemento : elementos) {
-        if (elemento.matches("\\d+(\\.\\d+)?")) { // Si el elemento es un número, se agrega a la expresión postfija
-            expresionPostfija.append(elemento).append(" ");
-        } else if (elemento.equals("(")) {
-            pilaOperadores.push('(');
-        } else if (elemento.equals(")")) {
-            while (!pilaOperadores.isEmpty() && pilaOperadores.peek() != '(') {
-                expresionPostfija.append(pilaOperadores.pop()).append(" ");
+        // Si el elemento es un operando, se agrega a la pila
+        if (elemento.matches("\\d+")) {
+            pilaOperandos.push(elemento);
+        } else if (precedenciaOperadores.containsKey(elemento.charAt(0))) {
+            // Si el elemento es un operador, se sacan los dos operandos de la pila
+            if (pilaOperandos.size() < 2) {
+                throw new IllegalArgumentException("Expresión no válida: faltan operandos");
             }
-            if (!pilaOperadores.isEmpty() && pilaOperadores.peek() == '(') {
-                pilaOperadores.pop();
-            }
-        } else { // Si el elemento es un operador
-            while (!pilaOperadores.isEmpty() && precedencia.get(pilaOperadores.peek()) >= precedencia.get(elemento.charAt(0))) {
-                expresionPostfija.append(pilaOperadores.pop()).append(" ");
-            }
-            pilaOperadores.push(elemento.charAt(0));
+            String operando2 = pilaOperandos.pop();
+            String operando1 = pilaOperandos.pop();
+            // Se construye la expresión prefija con los dos operandos y el operador
+            String expresionPrefija = String.format("%s %s %s", elemento, operando1, operando2);
+            // Se agrega la expresión prefija a la pila de operandos
+            pilaOperandos.push(expresionPrefija);
+        } else {
+            throw new IllegalArgumentException("Expresión no válida: " + elemento + " no es un operando ni un operador válido");
         }
     }
 
-    while (!pilaOperadores.isEmpty()) { // Después de recorrer toda la expresión, se agregan los operadores restantes a la expresión postfija
-        expresionPostfija.append(pilaOperadores.pop()).append(" ");
+    // Al final, la pila de operandos debe contener la expresión prefija completa
+    if (pilaOperandos.size() != 1) {
+        throw new IllegalArgumentException("Expresión no válida: sobran operandos");
     }
-
-    return expresionPostfija.toString().trim();
+    return pilaOperandos.peek();
 }
 
-    public static String convertirPrefijaAInfija(String prefija) {
-        prefija = prefija.replaceAll("\\s+", ""); // ignora los espacios en blanco
+    
+    public static String postfijaAInfija(String expresionPostfija) throws IllegalArgumentException {
+        Stack<String> pilaOperandos = new Stack<>();
+        String[] elementos = expresionPostfija.split("\\s+");
 
-        // Invertir la cadena de entrada y convertirla a una pila
-        StringBuilder prefijaInvertida = new StringBuilder(prefija).reverse();
-        Deque<String> pila = new ArrayDeque<>();
-
-        // Recorrer la cadena de entrada invertida
-        for (int i = 0; i < prefijaInvertida.length(); i++) {
-            char caracter = prefijaInvertida.charAt(i);
-            if (Character.isLetterOrDigit(caracter)) {
-                pila.push(Character.toString(caracter));
-            } else if (esOperador(caracter)) {
-                String operando1 = pila.pop();
-                String operando2 = pila.pop();
-                String subexpresion = "(" + operando1 + caracter + operando2 + ")";
-                pila.push(subexpresion);
-            }
-        }
-
-        return pila.pop();
-    }
-
-    public static String convertirPrefijaAPostfija(String prefija) {
-        prefija = prefija.replaceAll("\\s+", ""); // ignora los espacios en blanco
-
-        // Invertir la cadena de entrada y convertirla a una pila
-        StringBuilder prefijaInvertida = new StringBuilder(prefija).reverse();
-        Deque<String> pila = new ArrayDeque<>();
-
-        // Recorrer la cadena de entrada invertida
-        for (int i = 0; i < prefijaInvertida.length(); i++) {
-            char caracter = prefijaInvertida.charAt(i);
-            if (Character.isLetterOrDigit(caracter)) {
-                pila.push(Character.toString(caracter));
-            } else if (esOperador(caracter)) {
-                String operand2 = pila.pop();
-                String operand1 = pila.pop();
-                String postfijaSubexpresion = operand1 + operand2 + caracter;
-                pila.push(postfijaSubexpresion);
-            }
-        }
-
-        return pila.pop();
-    }
-
-    public static String convertirPostfijaAPrefija(String postfija) {
-        postfija = postfija.replaceAll("\\s+", ""); // ignora los espacios en blanco
-
-        // Convertir la cadena de entrada a una pila
-        Deque<String> pila = new ArrayDeque<>();
-
-        // Recorrer la cadena de entrada de derecha a izquierda
-        for (int i = postfija.length() - 1; i >= 0; i--) {
-            char caracter = postfija.charAt(i);
-            if (Character.isLetterOrDigit(caracter)) {
-                pila.push(Character.toString(caracter));
-            } else if (esOperador(caracter)) {
-                String operand1 = pila.pop();
-                String operand2 = pila.pop();
-                String operacion = operand1 + operand2 + caracter;
-                pila.push(operacion);
-            }
-        }
-
-        return pila.pop();
-    }
-
-    public static String convertirPostfijaAInfija(String postfija) {
-        postfija = postfija.replaceAll("\\s+", ""); // ignorar espacios en blanco
-
-        // Convertir la cadena de entrada a una pila
-        Deque<String> pila = new ArrayDeque<>();
-
-        // Recorrer la cadena de entrada
-        for (int i = 0; i < postfija.length(); i++) {
-            char caracter = postfija.charAt(i);
-            if (Character.isLetterOrDigit(caracter)) {
-                pila.push(String.valueOf(caracter));
+        for (String elemento : elementos) {
+            // Si el elemento es un operando, se agrega a la pila
+            if (elemento.matches("\\d+")) {
+                pilaOperandos.push(elemento);
+            } else if (precedenciaOperadores.containsKey(elemento.charAt(0))) {
+                // Si el elemento es un operador, se sacan los dos operandos de la pila
+                if (pilaOperandos.size() < 2) {
+                    throw new IllegalArgumentException("Expresión no válida: faltan operandos");
+                }
+                String operando2 = pilaOperandos.pop();
+                String operando1 = pilaOperandos.pop();
+                // Se construye la expresión infija con los dos operandos y el operador
+                String expresionInfija = String.format("(%s %s %s)", operando1, elemento, operando2);
+                // Se agrega la expresión infija a la pila de operandos
+                pilaOperandos.push(expresionInfija);
             } else {
-                String operando2 = pila.pop();
-                String operando1 = pila.pop();
-                String expresion = "(" + operando1 + caracter + operando2 + ")";
-                pila.push(expresion);
+                throw new IllegalArgumentException("Expresión no válida: " + elemento + " no es un operando ni un operador válido");
             }
         }
 
-        return pila.pop();
+        // Al final, la pila de operandos debe contener la expresión infija completa
+        if (pilaOperandos.size() != 1) {
+            throw new IllegalArgumentException("Expresión no válida: sobran operandos");
+        }
+        return pilaOperandos.peek();
     }
 
     public String convertirExpresion(String expresion, String tipoDestino) {
@@ -251,10 +286,10 @@ public static String infijaAPostfija(String expresionInfija) {
                 break;
             case "prefija":
                 if (tipoDestino.equals("infija")) {
-                    resultado = convertirPrefijaAInfija(expresion);
+                    resultado = prefijaAInfija(expresion);
                     System.out.println("La conversión a notacion infija es: " + resultado);
                 } else if (tipoDestino.equals("postfija")) {
-                    resultado = convertirPrefijaAPostfija(expresion);
+                    resultado = prefijaAPostfija(expresion);
                     System.out.println("La conversión a notacion postfija es: " + resultado);
                 } else {
                     System.out.println("Elija un destino válido");
@@ -262,19 +297,16 @@ public static String infijaAPostfija(String expresionInfija) {
                 break;
             case "postfija":
                 if (tipoDestino.equals("infija")) {
-                    resultado = convertirPostfijaAInfija(expresion);
+                    resultado = postfijaAInfija(expresion);
                     System.out.println("La conversión a notacion infija es: " + resultado);
                 } else if (tipoDestino.equals("prefija")) {
-                    resultado = convertirPostfijaAPrefija(expresion);
+                    
+                    resultado = postfijaAPrefija(expresion);
                     System.out.println("La conversión a notacion prefija es: " + resultado);
                 } else {
                     System.out.println("Elija un destino válido");
                 }
                 break;
-            case "Expresión no reconocida":
-                System.exit(1);
-                break;
-
             default:
                 System.out.println("No se ha elegido una opción válida, escriba la opción deseada manualmente por favor");
                 break;
@@ -283,5 +315,11 @@ public static String infijaAPostfija(String expresionInfija) {
         return resultado;
 
     }
+public static boolean esOperando(String elemento) {
+        return elemento.matches("\\d+(\\.\\d+)?");
+    }
 
+    public static boolean esOperador(String elemento) {
+        return elemento.matches("[\\+\\-\\*/\\^]");
+    }
 }
