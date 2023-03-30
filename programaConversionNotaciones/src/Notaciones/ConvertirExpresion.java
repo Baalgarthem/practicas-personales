@@ -21,8 +21,8 @@ public class ConvertirExpresion {
 
     public ConvertirExpresion(String expresionIngresada) {
     }
-    
-     public ConvertirExpresion() {
+
+    public ConvertirExpresion() {
     }
 
     private static final Map<Character, Integer> precedencia = new HashMap<>();
@@ -50,85 +50,100 @@ public class ConvertirExpresion {
             return "Expresión no reconocida";
         }
     }
-    
-    public static String infijaAPrefija(String infija) {
-    Stack<Character> pilaOperadores = new Stack<>();
-    String prefija = "";
-    String[] elementos = infija.split(NOTACION_INFIJA);
 
-    for (int i = elementos.length - 1; i >= 0; i--) {
-        String elemento = elementos[i];
-        if (elemento.matches("\\d+(\\.\\d+)?")) {
-            prefija = elemento + " " + prefija;
-        } else if (elemento.equals(")")) {
-            pilaOperadores.push(')');
-        } else if (elemento.equals("(")) {
-            while (!pilaOperadores.isEmpty() && pilaOperadores.peek() != ')') {
-                prefija = pilaOperadores.pop() + " " + prefija;
+    public String infijaAPrefija(String expresionInfija) {
+        StringBuilder expresionPrefija = new StringBuilder();
+        Stack<Character> pilaOperadores = new Stack<>();
+
+        // Se recorre la expresión infija de derecha a izquierda
+        for (int i = expresionInfija.length() - 1; i >= 0; i--) {
+            char c = expresionInfija.charAt(i);
+
+            // Si el caracter es un espacio, se ignora
+            if (Character.isWhitespace(c)) {
+                continue;
             }
-            pilaOperadores.pop();
-        } else {
-            while (!pilaOperadores.isEmpty() && jerarquiaOperadores(pilaOperadores.peek()) > jerarquiaOperadores(elemento.charAt(0))) {
-                prefija = pilaOperadores.pop() + " " + prefija;
+
+            // Si el caracter es un número, se agrega a la expresión prefija
+            if (Character.isDigit(c)) {
+                expresionPrefija.insert(0, c);
+
+                // Si el caracter anterior es un espacio, se agregaron varios dígitos
+                while (i > 0 && Character.isDigit(expresionInfija.charAt(i - 1))) {
+                    i--;
+                    expresionPrefija.insert(0, expresionInfija.charAt(i));
+                }
+                expresionPrefija.insert(0, ' ');
+            } // Si el caracter es un operador
+            else if (esOperador(c)) {
+                while (!pilaOperadores.isEmpty() && precedencia.get(c) < precedencia.get(pilaOperadores.peek())) {
+                    expresionPrefija.insert(0, pilaOperadores.pop() + " ");
+                }
+                pilaOperadores.push(c);
+            } // Si el caracter es un paréntesis de cierre
+            else if (c == ')') {
+                pilaOperadores.push(c);
+            } // Si el caracter es un paréntesis de apertura
+            else if (c == '(') {
+                while (!pilaOperadores.isEmpty() && pilaOperadores.peek() != ')') {
+                    expresionPrefija.insert(0, pilaOperadores.pop() + " ");
+                }
+                pilaOperadores.pop();
             }
-            pilaOperadores.push(elemento.charAt(0));
+        }
+
+        // Se vacía la pila de operadores restantes
+        while (!pilaOperadores.isEmpty()) {
+            expresionPrefija.insert(0, pilaOperadores.pop() + " ");
+        }
+
+        return expresionPrefija.toString().trim();
+    }
+
+    public static String infijaAPostfija(String infija) {
+        Stack<Character> pilaOperadores = new Stack<>();
+        String postfija = "";
+        String[] elementos = infija.split(NOTACION_INFIJA);
+
+        for (String elemento : elementos) {
+            if (elemento.matches("\\d+(\\.\\d+)?")) {
+                postfija += elemento + " ";
+            } else if (elemento.equals("(")) {
+                pilaOperadores.push('(');
+            } else if (elemento.equals(")")) {
+                while (!pilaOperadores.isEmpty() && pilaOperadores.peek() != '(') {
+                    postfija += pilaOperadores.pop() + " ";
+                }
+                pilaOperadores.pop();
+            } else {
+                while (!pilaOperadores.isEmpty() && jerarquiaOperadores(pilaOperadores.peek()) >= jerarquiaOperadores(elemento.charAt(0))) {
+                    postfija += pilaOperadores.pop() + " ";
+                }
+                pilaOperadores.push(elemento.charAt(0));
+            }
+        }
+
+        while (!pilaOperadores.isEmpty()) {
+            postfija += pilaOperadores.pop() + " ";
+        }
+
+        return postfija.trim();
+    }
+
+    private static int jerarquiaOperadores(char operador) {
+        switch (operador) {
+            case '^':
+                return 3;
+            case '*':
+            case '/':
+                return 2;
+            case '+':
+            case '-':
+                return 1;
+            default:
+                return 0;
         }
     }
-
-    while (!pilaOperadores.isEmpty()) {
-        prefija = pilaOperadores.pop() + " " + prefija;
-    }
-
-    String resultado = prefija.trim();
-    return resultado;
-}
-
-    
-public static String infijaAPostfija(String infija) {
-    Stack<Character> pilaOperadores = new Stack<>();
-    String postfija = "";
-    String[] elementos = infija.split(NOTACION_INFIJA);
-
-    for (String elemento : elementos) {
-        if (elemento.matches("\\d+(\\.\\d+)?")) {
-            postfija += elemento + " ";
-        } else if (elemento.equals("(")) {
-            pilaOperadores.push('(');
-        } else if (elemento.equals(")")) {
-            while (!pilaOperadores.isEmpty() && pilaOperadores.peek() != '(') {
-                postfija += pilaOperadores.pop() + " ";
-            }
-            pilaOperadores.pop();
-        } else {
-            while (!pilaOperadores.isEmpty() && jerarquiaOperadores(pilaOperadores.peek()) >= jerarquiaOperadores(elemento.charAt(0))) {
-                postfija += pilaOperadores.pop() + " ";
-            }
-            pilaOperadores.push(elemento.charAt(0));
-        }
-    }
-
-    while (!pilaOperadores.isEmpty()) {
-        postfija += pilaOperadores.pop() + " ";
-    }
-
-    return postfija.trim();
-}
-
-private static int jerarquiaOperadores(char operador) {
-    switch (operador) {
-        case '^':
-            return 3;
-        case '*':
-        case '/':
-            return 2;
-        case '+':
-        case '-':
-            return 1;
-        default:
-            return 0;
-    }
-}
-
 
     public static String convertirInfijaAPostfija(String infija) {
         infija = infija.replaceAll("\\s+", ""); // ignora los espacios en blanco
@@ -259,36 +274,36 @@ private static int jerarquiaOperadores(char operador) {
         String tipoExpresion = detectarTipoExpresion(expresion);
 
         switch (tipoExpresion) {
-            case "infijo":
+            case "infija":
                 System.out.println("¿Desea convertir la expresion infija a 'prefija' o 'postfija'?");
-                if (tipoDestino.equals("prefijo")) {
+                if (tipoDestino.equals("prefija")) {
                     resultado = infijaAPrefija(expresion);
                     System.out.println("La conversión a notación prefija es: " + resultado);
-                } else if (tipoDestino.equals("postfijo")) {
+                } else if (tipoDestino.equals("postfija")) {
                     resultado = convertirInfijaAPostfija(expresion);
                     System.out.println("La conversión a notación postfija es: " + resultado);
                 } else {
                     System.out.println("Tipo de destino no válido");
                 }
                 break;
-            case "prefijo":
+            case "prefija":
                 System.out.println("¿Desea convertir la expresión prefija a infija o postfija?");
-                if (tipoDestino.equals("infijo")) {
+                if (tipoDestino.equals("infija")) {
                     resultado = convertirPrefijaAInfija(expresion);
                     System.out.println("La conversión a notación infija es: " + resultado);
-                } else if (tipoDestino.equals("postfijo")) {
+                } else if (tipoDestino.equals("postfija")) {
                     resultado = convertirPrefijaAPostfija(expresion);
                     System.out.println("La conversión a notación postfija es: " + resultado);
                 } else {
                     System.out.println("Tipo de destino no válido");
                 }
                 break;
-            case "postfijo":
+            case "postfija":
                 System.out.println("¿Desea convertir la expresión postfija a infija o prefija?");
-                if (tipoDestino.equals("infijo")) {
+                if (tipoDestino.equals("infija")) {
                     resultado = convertirPostfijaAInfija(expresion);
                     System.out.println("La conversión a notación infija es: " + resultado);
-                } else if (tipoDestino.equals("prefijo")) {
+                } else if (tipoDestino.equals("prefija")) {
                     resultado = convertirPostfijaAPrefija(expresion);
                     System.out.println("La conversión a notación prefija es: " + resultado);
                 } else {

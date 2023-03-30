@@ -3,11 +3,9 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/Alush/OneDrive/Documentos/NetBeansProjects/programaConversionNotaciones/src/programaconversionnotaciones/conversion.java</file>
-            <file>file:/C:/Users/Alush/OneDrive/Documentos/NetBeansProjects/programaConversionNotaciones/src/programaconversionnotaciones/ProgramaConversionNotaciones.java</file>
-            <file>file:/C:/Users/Alush/OneDrive/Documentos/NetBeansProjects/programaConversionNotaciones/src/programaconversionnotaciones/TipoExpresion.java</file>
-            <file>file:/C:/Users/Alush/OneDrive/Documentos/NetBeansProjects/programaConversionNotaciones/src/programaconversionnotaciones/pila.java</file>
-            <file>file:/C:/Users/Alush/OneDrive/Documentos/NetBeansProjects/programaConversionNotaciones/src/programaconversionnotaciones/Gramatica.java</file>
+            <file>file:/C:/Users/Alush/OneDrive/Documentos/NetBeansProjects/programaConversionNotaciones/src/Notaciones/ConvertirExpresion.java</file>
+            <file>file:/C:/Users/Alush/OneDrive/Documentos/NetBeansProjects/programaConversionNotaciones/src/Notaciones/Main.java</file>
+            <file>file:/C:/Users/Alush/OneDrive/Documentos/NetBeansProjects/programaConversionNotaciones/src/Notaciones/otroMain.java</file>
         </group>
     </open-files>
 </project-private>
