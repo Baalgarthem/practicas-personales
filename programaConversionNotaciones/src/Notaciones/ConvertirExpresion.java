@@ -10,13 +10,13 @@ import java.util.regex.Pattern;
 
 public class ConvertirExpresion {
 
-// Expresi贸n regular para notaci贸n infija
+// Expresi髇 regular para notaci髇 infija
     static final String NOTACION_INFIJA = "\\d+(\\s*[\\+\\-\\*/\\^]\\s*\\d+)*(\\s*\\([^()]+\\)\\s*(\\s*[\\+\\-\\*/\\^]\\s*\\([^()]+\\)\\s*)*)*";
 
-// Expresi贸n regular para notaci贸n prefija
+// Expresi髇 regular para notaci髇 prefija
     static final String NOTACION_PREFIJA = "\\s*[\\+\\-\\*/\\^]\\s*((\\s*(\\d+(\\.\\d+)?)\\s*)+|\\s*[\\+\\-\\*/\\^]\\s*((\\s*(\\d+(\\.\\d+)?)\\s*)+\\s*)+)+";
 
-// Expresi贸n regular para notaci贸n postfija
+// Expresi髇 regular para notaci髇 postfija
     static final String NOTACION_POSTFIJA = "\\d+(\\.\\d+)?(\\s+\\d+(\\.\\d+)?\\s+[\\+\\-\\*/\\^])*\\s*\\d+(\\.\\d+)?\\s*[\\+\\-\\*/\\^]?";
 
     public ConvertirExpresion(String expresionIngresada) {
@@ -47,7 +47,7 @@ public class ConvertirExpresion {
         } else if (expresion.matches(NOTACION_POSTFIJA)) {
             return "postfija";
         } else {
-            return "Expresi贸n no reconocida";
+            return "Expresi髇 no reconocida";
         }
     }
 
@@ -55,7 +55,7 @@ public class ConvertirExpresion {
         StringBuilder expresionPrefija = new StringBuilder();
         Stack<Character> pilaOperadores = new Stack<>();
 
-        // Se recorre la expresi贸n infija de derecha a izquierda
+        // Se recorre la expresi髇 infija de derecha a izquierda
         for (int i = expresionInfija.length() - 1; i >= 0; i--) {
             char c = expresionInfija.charAt(i);
 
@@ -64,11 +64,11 @@ public class ConvertirExpresion {
                 continue;
             }
 
-            // Si el caracter es un n煤mero, se agrega a la expresi贸n prefija
+            // Si el caracter es un n鷐ero, se agrega a la expresi髇 prefija
             if (Character.isDigit(c)) {
                 expresionPrefija.insert(0, c);
 
-                // Si el caracter anterior es un espacio, se agregaron varios d铆gitos
+                // Si el caracter anterior es un espacio, se agregaron varios d韌itos
                 while (i > 0 && Character.isDigit(expresionInfija.charAt(i - 1))) {
                     i--;
                     expresionPrefija.insert(0, expresionInfija.charAt(i));
@@ -80,10 +80,10 @@ public class ConvertirExpresion {
                     expresionPrefija.insert(0, pilaOperadores.pop() + " ");
                 }
                 pilaOperadores.push(c);
-            } // Si el caracter es un par茅ntesis de cierre
+            } // Si el caracter es un par閚tesis de cierre
             else if (c == ')') {
                 pilaOperadores.push(c);
-            } // Si el caracter es un par茅ntesis de apertura
+            } // Si el caracter es un par閚tesis de apertura
             else if (c == '(') {
                 while (!pilaOperadores.isEmpty() && pilaOperadores.peek() != ')') {
                     expresionPrefija.insert(0, pilaOperadores.pop() + " ");
@@ -92,7 +92,7 @@ public class ConvertirExpresion {
             }
         }
 
-        // Se vac铆a la pila de operadores restantes
+        // Se vac韆 la pila de operadores restantes
         while (!pilaOperadores.isEmpty()) {
             expresionPrefija.insert(0, pilaOperadores.pop() + " ");
         }
@@ -168,7 +168,7 @@ public class ConvertirExpresion {
                 while (!pila.isEmpty() && pila.peek() != '(') {
                     postfija.append(pila.pop());
                 }
-                pila.pop(); // quita el par茅ntesis izquierdo
+                pila.pop(); // quita el par閚tesis izquierdo
             }
         }
 
@@ -275,43 +275,42 @@ public class ConvertirExpresion {
 
         switch (tipoExpresion) {
             case "infija":
-                System.out.println("驴Desea convertir la expresion infija a 'prefija' o 'postfija'?");
                 if (tipoDestino.equals("prefija")) {
                     resultado = infijaAPrefija(expresion);
-                    System.out.println("La conversi贸n a notaci贸n prefija es: " + resultado);
+                    System.out.println("La conversi髇 a notaci髇 prefija es: " + resultado);
                 } else if (tipoDestino.equals("postfija")) {
                     resultado = convertirInfijaAPostfija(expresion);
-                    System.out.println("La conversi贸n a notaci贸n postfija es: " + resultado);
+                    System.out.println("La conversi髇 a notacion postfija es: " + resultado);
                 } else {
-                    System.out.println("Tipo de destino no v谩lido");
+                    System.out.println("Tipo de destino no v醠ido");
                 }
                 break;
             case "prefija":
-                System.out.println("驴Desea convertir la expresi贸n prefija a infija o postfija?");
+                System.out.println("緿esea convertir la expresion prefija a infija o postfija?");
                 if (tipoDestino.equals("infija")) {
                     resultado = convertirPrefijaAInfija(expresion);
-                    System.out.println("La conversi贸n a notaci贸n infija es: " + resultado);
+                    System.out.println("La conversi髇 a notacion infija es: " + resultado);
                 } else if (tipoDestino.equals("postfija")) {
                     resultado = convertirPrefijaAPostfija(expresion);
-                    System.out.println("La conversi贸n a notaci贸n postfija es: " + resultado);
+                    System.out.println("La conversi髇 a notacion postfija es: " + resultado);
                 } else {
-                    System.out.println("Tipo de destino no v谩lido");
+                    System.out.println("Tipo de destino no valido");
                 }
                 break;
             case "postfija":
-                System.out.println("驴Desea convertir la expresi贸n postfija a infija o prefija?");
+                System.out.println("緿esea convertir la expresion postfija a infija o prefija?");
                 if (tipoDestino.equals("infija")) {
                     resultado = convertirPostfijaAInfija(expresion);
-                    System.out.println("La conversi贸n a notaci贸n infija es: " + resultado);
+                    System.out.println("La conversi髇 a notacion infija es: " + resultado);
                 } else if (tipoDestino.equals("prefija")) {
                     resultado = convertirPostfijaAPrefija(expresion);
-                    System.out.println("La conversi贸n a notaci贸n prefija es: " + resultado);
+                    System.out.println("La conversi髇 a notacion prefija es: " + resultado);
                 } else {
-                    System.out.println("Tipo de destino no v谩lido");
+                    System.out.println("Tipo de destino no valido");
                 }
                 break;
             default:
-                System.out.println("Tipo de expresi贸n no v谩lido");
+                System.out.println("Tipo de expresi髇 no valido");
                 break;
         }
 

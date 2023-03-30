@@ -8,19 +8,19 @@ public class Main {
 
         Scanner scanner = new Scanner(System.in);
 
-        System.out.print("Ingrese una expresiÃ³n: ");
+        System.out.print("Ingrese una expresión: ");
         String expresion = scanner.nextLine();
 
         ConvertirExpresion accesoMetodos = new ConvertirExpresion(expresion);
 
         String tipoExpresion = accesoMetodos.detectarTipoExpresion(expresion);
-        System.out.println("El tipo de la expresiÃ³n ingresada es: " + tipoExpresion);
+        System.out.println("El tipo de la expresión ingresada es: " + tipoExpresion);
         
-         System.out.println("Â¿A quÃ© notaciÃ³n desea convertir la expresiÃ³n? (infija, prefija, postfija)");
+         System.out.println("¿A qué notación desea convertir la expresión? (infija, prefija, postfija)");
         String expresionDeSALIDA = scanner.nextLine();
         
         String resultado = accesoMetodos.convertirExpresion(expresion, expresionDeSALIDA);
-        System.out.println("La expresiÃ³n convertida es: " + resultado);
+       
         
 
     }
