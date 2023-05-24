@@ -1,0 +1,23 @@
+.main-nav {
+margin-top: 10px;
+list-style: none;
+padding-left: 0;
+background-color: blueviolet;
+}
+
+.main-nav_item {
+display: inline-block;
+}
+
+.main-nav_item a {
+
+    color:white;
+    padding: 5px;
+    border-radius: 2px;
+    text-decoration: none;
+}
+
+.main-nav_item a:hover {
+
+    color:blueviolet;
+}
