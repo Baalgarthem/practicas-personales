@@ -7,13 +7,13 @@ public class librosNuevos extends libros { //aplicando la herencia, esta clase h
     }
     //segundo constructor
     public librosNuevos(String nombreLibro, String autorLibro, int añoLibro) {
-        super.nombreLibro = nombreLibro;
-        super.autorLibro = autorLibro;
-        super.añoLibro = añoLibro;
+        libros.nombreLibro = nombreLibro;
+        libros.autorLibro = autorLibro;
+        libros.añoLibro = añoLibro;
     }
     //tercer constructor, con esto hemos hecho una sobrecarga de constructores
     public librosNuevos(int añoLibro) {
-        this.añoLibro = añoLibro;
+        librosNuevos.añoLibro = añoLibro;
     }
     
     @Override

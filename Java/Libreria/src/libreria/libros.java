@@ -2,9 +2,9 @@ package libreria;
 
 public class libros {
 
-    String nombreLibro;
-    String autorLibro;
-    int añoLibro;
+    static String nombreLibro;
+    static String autorLibro;
+    static int añoLibro;
 
     //primer constructor
     public libros() {
@@ -12,9 +12,9 @@ public class libros {
 
     //segundo constructor
     public libros(String nombreLibro, String autorLibro, int añoLibro) {
-        this.nombreLibro = nombreLibro;
-        this.autorLibro = autorLibro;
-        this.añoLibro = añoLibro;
+        libros.nombreLibro = nombreLibro;
+        libros.autorLibro = autorLibro;
+        libros.añoLibro = añoLibro;
     }
 
     //tercer constructor, con esto hemos hecho una sobrecarga de constructores

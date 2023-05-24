@@ -26,11 +26,16 @@ public class menu {
                     System.out.println("Ingresa el año del libro:");
                     int año = Integer.parseInt(entradaTecladoDelUsuario.nextLine());
 
-                    libros libroañadido = new libros(nombreLibro, autorLibro, año);
-                    librosAñadidos[contadorLibros] = libroañadido;
+                    libros revision1 = new libros(nombreLibro, autorLibro, año);
+                    librosNuevos revision2 = new librosNuevos(nombreLibro, autorLibro, año);
+                    librosViejos revision3 = new librosViejos(nombreLibro, autorLibro, año);
+                    librosAñadidos[contadorLibros] = revision1; //uso de arreglo para almacenar libros
                     contadorLibros++;
 
-                    libroañadido.revisarLibro(año, autorLibro);
+                    revision1.revisarLibro(año, autorLibro);
+                    revision2.revisarLibro(año, autorLibro);
+                    revision3.revisarLibro(año, autorLibro);
+                    
                 }
                 case "2" -> {
                     System.out.println("Elegiste la opción 2");
@@ -42,9 +47,9 @@ public class menu {
             }
         } while (respuesta);
 
-        if (contadorLibros > 0) {
+        if (contadorLibros > 0) { 
             System.out.println("Los libros que ingresaste fueron:");
-            for (int i = 0; i < contadorLibros; i++) {
+            for (int i = 0; i < contadorLibros; i++) { //Impresion del arreglo recorriendo en un for
                 libros libro = librosAñadidos[i];
                 System.out.println("Libro: '" + libro.getNombreLibro() + "' - Autor: " + libro.getAutorLibro());
             }
