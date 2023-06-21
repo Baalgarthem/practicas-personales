@@ -1,7 +1,6 @@
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  */
-
 package com.mycompany.basesdatos;
 
 import java.sql.Connection;
@@ -13,7 +12,7 @@ import java.util.Scanner;
  */
 public class Inicio {
 
-   public static void main(String[] args) {
+    public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         int opcion = 0;
 
@@ -22,8 +21,8 @@ public class Inicio {
             System.out.println("Aplicación de mensajes");
             System.out.println("1. Crear mensaje");
             System.out.println("2. Listar mensajes");
-            System.out.println("3. Editar mensajes");
-            System.out.println("4. Eliminar mensajes");
+            System.out.println("3. Borrar mensajes");
+            System.out.println("4. Editar mensajes");
             System.out.println("5. Salir");
 
             opcion = sc.nextInt();
@@ -36,10 +35,10 @@ public class Inicio {
                     MensajesService.listarMensajes();
                     break;
                 case 3:
-                    MensajesService.editarMensaje();
+                    MensajesService.borrarMensaje();
                     break;
                 case 4:
-                    MensajesService.borrarMensaje();
+                    MensajesService.editarMensaje();
                     break;
 
                 default:
@@ -48,4 +47,5 @@ public class Inicio {
 
         } while (opcion != 5);
 
-   }}
+    }
+}
