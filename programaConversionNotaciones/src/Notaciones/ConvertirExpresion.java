@@ -17,7 +17,7 @@ public class ConvertirExpresion {
     static final String NUMERO = "\\d+(\\.\\d+)?";
     static final String NOTACION_INFIJA = "\\s*(\\d+\\s*[+\\-*/^]\\s*)+\\d+\\s*(\\(\\s*(\\d+\\s*[+\\-*/^]\\s*)+\\d+\\s*\\)\\s*(\\s*[+\\-*/^]\\s*\\(\\s*(\\d+\\s*[+\\-*/^]\\s*)+\\d+\\s*\\)\\s*)*)*";
     static final String NOTACION_PREFIJA = "\\s*" + OPERADORES + "\\s*((\\s*" + NUMERO + "\\s*)+|\\s*" + OPERADORES + "\\s*((\\s*" + NUMERO + "\\s*)+\\s*)+)+";
-static final String NOTACION_POSTFIJA = "(\\s*\\d+(\\.\\d+)?\\s+)+((\\s*[\\+\\-\\*/\\^]\\s+\\d+(\\.\\d+)?\\s+)+)+[\\+\\-\\*/\\^]?\\s*|\\d+(\\.\\d+)?(\\s+\\d+(\\.\\d+)?(\\s+[\\+\\-\\*/\\^]\\s+)?)*\\s*[\\+\\-\\*/\\^]?\\s*";
+    static final String NOTACION_POSTFIJA = "(\\s*\\d+(\\.\\d+)?\\s+)+((\\s*[\\+\\-\\*/\\^]\\s+\\d+(\\.\\d+)?\\s+)+)+[\\+\\-\\*/\\^]?\\s*|\\d+(\\.\\d+)?(\\s+\\d+(\\.\\d+)?(\\s+[\\+\\-\\*/\\^]\\s+)?)*\\s*[\\+\\-\\*/\\^]?\\s*";
 
     public ConvertirExpresion(String expresionIngresada) {
     }
@@ -205,38 +205,37 @@ static final String NOTACION_POSTFIJA = "(\\s*\\d+(\\.\\d+)?\\s+)+((\\s*[\\+\\-\
         return expresionPostfija.toString().trim();
     }
 
- public static String postfijaAPrefija(String expresionPostfija) throws IllegalArgumentException {
-    Stack<String> pilaOperandos = new Stack<>();
-    String[] elementos = expresionPostfija.split("\\s+");
+    public static String postfijaAPrefija(String expresionPostfija) throws IllegalArgumentException {
+        Stack<String> pilaOperandos = new Stack<>();
+        String[] elementos = expresionPostfija.split("\\s+");
 
-    for (String elemento : elementos) {
-        // Si el elemento es un operando, se agrega a la pila
-        if (elemento.matches("\\d+")) {
-            pilaOperandos.push(elemento);
-        } else if (precedenciaOperadores.containsKey(elemento.charAt(0))) {
-            // Si el elemento es un operador, se sacan los dos operandos de la pila
-            if (pilaOperandos.size() < 2) {
-                throw new IllegalArgumentException("Expresión no válida: faltan operandos");
+        for (String elemento : elementos) {
+            // Si el elemento es un operando, se agrega a la pila
+            if (elemento.matches("\\d+")) {
+                pilaOperandos.push(elemento);
+            } else if (precedenciaOperadores.containsKey(elemento.charAt(0))) {
+                // Si el elemento es un operador, se sacan los dos operandos de la pila
+                if (pilaOperandos.size() < 2) {
+                    throw new IllegalArgumentException("Expresión no válida: faltan operandos");
+                }
+                String operando2 = pilaOperandos.pop();
+                String operando1 = pilaOperandos.pop();
+                // Se construye la expresión prefija con los dos operandos y el operador
+                String expresionPrefija = String.format("%s %s %s", elemento, operando1, operando2);
+                // Se agrega la expresión prefija a la pila de operandos
+                pilaOperandos.push(expresionPrefija);
+            } else {
+                throw new IllegalArgumentException("Expresión no válida: " + elemento + " no es un operando ni un operador válido");
             }
-            String operando2 = pilaOperandos.pop();
-            String operando1 = pilaOperandos.pop();
-            // Se construye la expresión prefija con los dos operandos y el operador
-            String expresionPrefija = String.format("%s %s %s", elemento, operando1, operando2);
-            // Se agrega la expresión prefija a la pila de operandos
-            pilaOperandos.push(expresionPrefija);
-        } else {
-            throw new IllegalArgumentException("Expresión no válida: " + elemento + " no es un operando ni un operador válido");
         }
+
+        // Al final, la pila de operandos debe contener la expresión prefija completa
+        if (pilaOperandos.size() != 1) {
+            throw new IllegalArgumentException("Expresión no válida: sobran operandos");
+        }
+        return pilaOperandos.peek();
     }
 
-    // Al final, la pila de operandos debe contener la expresión prefija completa
-    if (pilaOperandos.size() != 1) {
-        throw new IllegalArgumentException("Expresión no válida: sobran operandos");
-    }
-    return pilaOperandos.peek();
-}
-
-    
     public static String postfijaAInfija(String expresionPostfija) throws IllegalArgumentException {
         Stack<String> pilaOperandos = new Stack<>();
         String[] elementos = expresionPostfija.split("\\s+");
@@ -270,7 +269,7 @@ static final String NOTACION_POSTFIJA = "(\\s*\\d+(\\.\\d+)?\\s+)+((\\s*[\\+\\-\
 
     public String convertirExpresion(String expresion, String tipoDestino) {
         String resultado = "";
-        String tipoExpresion = detectarTipoExpresion(expresion);
+        String tipoExpresion = detectarTipoExpresion(expresion); //infija, prefija , postfija
 
         switch (tipoExpresion) {
             case "infija":
@@ -300,7 +299,7 @@ static final String NOTACION_POSTFIJA = "(\\s*\\d+(\\.\\d+)?\\s+)+((\\s*[\\+\\-\
                     resultado = postfijaAInfija(expresion);
                     System.out.println("La conversión a notacion infija es: " + resultado);
                 } else if (tipoDestino.equals("prefija")) {
-                    
+
                     resultado = postfijaAPrefija(expresion);
                     System.out.println("La conversión a notacion prefija es: " + resultado);
                 } else {
@@ -315,7 +314,8 @@ static final String NOTACION_POSTFIJA = "(\\s*\\d+(\\.\\d+)?\\s+)+((\\s*[\\+\\-\
         return resultado;
 
     }
-public static boolean esOperando(String elemento) {
+
+    public static boolean esOperando(String elemento) {
         return elemento.matches("\\d+(\\.\\d+)?");
     }
 
