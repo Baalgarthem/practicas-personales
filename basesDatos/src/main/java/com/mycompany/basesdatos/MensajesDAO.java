@@ -9,5 +9,8 @@ package com.mycompany.basesdatos;
  * @author Alush
  */
 public class MensajesDAO {
-    
+    public static void crearMensaje (Mensajes mensaje){}
+    public static void leerMensaje (){}
+    public static void borrarMensaje (int id_mensaje){}
+    public static void editarMensaje (Mensajes mensaje){}
 }
