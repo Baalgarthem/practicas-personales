@@ -9,12 +9,17 @@ package com.mycompany.basesdatos;
  * @author Alush
  */
 public class Mensajes {
-    private int id_mensaje;
-    private String mensaje;
-    private String autor_mensaje;
-    private String fecha_mensaje;
+    int id_mensaje;
+    String mensaje;
+    String autor_mensaje;
+    String fecha_mensaje;
 
     public Mensajes() {
+    }
+
+    public Mensajes(String mensaje, String autor_mensaje) {
+        this.mensaje = mensaje;
+        this.autor_mensaje = autor_mensaje;
     }
 
     public Mensajes(String mensaje, String autor_mensaje, String fecha_mensaje) {
@@ -22,8 +27,6 @@ public class Mensajes {
         this.autor_mensaje = autor_mensaje;
         this.fecha_mensaje = fecha_mensaje;
     }
-    
-    
 
     public int getId_mensaje() {
         return id_mensaje;
@@ -57,5 +60,7 @@ public class Mensajes {
         this.fecha_mensaje = fecha_mensaje;
     }
     
+    
+
     
 }
