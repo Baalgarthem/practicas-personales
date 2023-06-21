@@ -15,8 +15,8 @@ public class Inicio {
    public static void main(String[] args) {
         Conexion conexion = new Conexion();
         
-        try {
-            Connection pruebaConexion = conexion.get_connection();
+        try (Connection pruebaConexion = conexion.get_connection()){
+            
         } catch (Exception e) {
             System.out.println(e);
         }
