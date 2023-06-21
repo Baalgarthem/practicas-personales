@@ -10,7 +10,7 @@ import java.sql.Connection;
  *
  * @author Alush
  */
-public class inicio {
+public class Inicio {
 
    public static void main(String[] args) {
         Conexion conexion = new Conexion();
